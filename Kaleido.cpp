@@ -44,7 +44,7 @@ float getAngleInRadians (float x1, float y1,float x2,float y2 );
 
 float getRandomNumberInRange();
 
-void runKaleidoMixed();
+void runKaleidoRandom();
 
 void createVideo();
 
@@ -60,8 +60,8 @@ bool isEvenBlock(int y, bool isEven);
 
 int main(){
 
-	runKaleidoBlocks();
-	//runKaleidoMixed();
+	//runKaleidoBlocks();
+	runKaleidoRandom();
 	//runKaleidoMixedAndSmoothed();
 
 	return (0);
@@ -380,7 +380,7 @@ void runKaleidoBlocks(){
 	}//end while
 }
 
-void runKaleidoMixed(){
+void runKaleidoRandom(){
 
 		// open the video file for reading
 		VideoCapture cap("out.mp4");
