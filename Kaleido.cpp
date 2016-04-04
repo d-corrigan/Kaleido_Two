@@ -25,7 +25,7 @@ struct YXYColors {
 int value = 0;
 float delta = .20;
 int frame_rate = 120;
-int BLOCKSIZE = 32;
+int BLOCKSIZE = 16;
 int previousBlock = 0;
 
 YXYColors convertToYxy(XYZColors c);
@@ -252,6 +252,9 @@ void runKaleidoBlocks(){
 		Mat block_fusion_pair_1 = Mat::zeros( XYZ.size(), XYZ.type() );
 		Mat block_fusion_pair_2 = Mat::zeros( XYZ.size(), XYZ.type() );
 
+		Mat pair_1 = Mat::zeros( XYZ.size(), XYZ.type() );
+		Mat pair_2 = Mat::zeros( XYZ.size(), XYZ.type() );
+
 		bool isEven = true;
 
 		// check if divisors fit to image dimensions
@@ -362,22 +365,15 @@ void runKaleidoBlocks(){
 		cvtColor(block_fusion_pair_2,block_fusion_pair_2,COLOR_XYZ2BGR);
 
 
-
-
-
-		// you have to call the actual function, not copy/paste the declaration !
-		//cv::fastNlMeansDenoisingColored( block_fusion_pair_1, block_fusion_pair_1, 3.0, 3.0, 7, 21 );
-
-		// you have to call the actual function, not copy/paste the declaration !
-		//cv::fastNlMeansDenoisingColored( block_fusion_pair_2, block_fusion_pair_2, 3.0, 3.0, 7, 21 );
-
-
+		//BILATERAL FILTER	used to smooth blocks
+		bilateralFilter ( block_fusion_pair_1, pair_1, 15, 80, 80 );
+		bilateralFilter ( block_fusion_pair_2, pair_2, 15, 80, 80 );
 
 		//Write images to file to be converted to video
-		cv::imwrite(getNextName(),block_fusion_pair_2);
-		cv::imwrite(getNextName(),block_fusion_pair_1);
-		cv::imwrite(getNextName(),block_fusion_pair_2);
-		cv::imwrite(getNextName(),block_fusion_pair_1);
+		cv::imwrite(getNextName(),pair_2);
+		cv::imwrite(getNextName(),pair_1);
+		cv::imwrite(getNextName(),pair_2);
+		cv::imwrite(getNextName(),pair_1);
 
 
 
