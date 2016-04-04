@@ -60,8 +60,8 @@ bool isEvenBlock(int y, bool isEven);
 
 int main(){
 
-	runKaleidoBlocks();
-	//runKaleidoMixed();
+	//runKaleidoBlocks();
+	runKaleidoRandom();
 	//runKaleidoMixedAndSmoothed();
 
 	return (0);
