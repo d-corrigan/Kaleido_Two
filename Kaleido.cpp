@@ -30,7 +30,7 @@ int previousBlock = 0;
 
 YXYColors convertToYxy(XYZColors c);
 
-String getNextName(int method);
+String getNextName();
 
 bool isInRGBRange(float x, float y);
 
@@ -46,7 +46,7 @@ float getRandomNumberInRange();
 
 void runKaleidoRandom();
 
-void createVideo(int method);
+void createVideo();
 
 void runKaleidoBlocks();
 
@@ -61,7 +61,7 @@ bool isEvenBlock(int y, bool isEven);
 int main(){
 
 	runKaleidoBlocks();
-	runKaleidoRandom();
+	//runKaleidoMixed();
 	//runKaleidoMixedAndSmoothed();
 
 	return (0);
@@ -98,28 +98,10 @@ float convertBackZ(float Y, float x, float y ){
 	return ( 1 - x - y ) * ( Y*255 / y );
 }
 
-String getNextName(int method){
-
-
-	string dest = "";
-
-	if (method == 0){
-
-		dest = "block_images/";
-
-	}else if(method == 1){
-
-		dest = "random_images/";
-
-	}else{
-
-		dest = "mixed_images/";
-
-	}
-
+String getNextName(){
 
 	std::stringstream ss;
-	ss << dest<< std::setw(5) << std::setfill('0') << value <<".png";
+	ss << "images/"<< std::setw(5) << std::setfill('0') << value <<".png";
 	std::string str = ss.str();
 	//std::cout <<"Writing: "<< str<<endl;
 
@@ -197,43 +179,15 @@ float calculateNewYPoint(float dist, float angle, float y){
 
 }
 
-void createVideo(int method){
-
-
-	string dest,vid = "";
-
-		if (method == 0){
-
-			dest = "block_images/";
-			vid = "block_videos/";
-
-		}else if(method == 1){
-
-			dest = "random_images/";
-			vid = "random_videos/";
-
-		}else{
-
-			dest = "mixed_images/";
-			vid = "mixed_videos/";
-
-		}
-
-		std::stringstream ss;
-		ss << dest<< "%05d.png"<<endl;
-		std::string str = ss.str();
-
+void createVideo(){
 
 	// Write to Video when finished reassembling four sub-frames
-	cv::VideoCapture in_capture(str);
+	cv::VideoCapture in_capture("images/%05d.png");
 
 	Mat img;
 
-	ss << vid<< "video.avi"<<endl;
-	str = ss.str();
-
 	cout<< "video written @"<<frame_rate<<" frames/sec"<<endl;
-	VideoWriter out_capture(str, CV_FOURCC('M','J','P','G'), frame_rate, Size(512,512));
+	VideoWriter out_capture("videos/video.avi", CV_FOURCC('M','J','P','G'), frame_rate, Size(512,512));
 
 	while (true){
 
@@ -246,7 +200,8 @@ void createVideo(int method){
 }
 
 void runKaleidoBlocks(){
-	cout<<"RUNNING KALEIDO BLOCK"<<endl;
+
+	cout<<"runKaleidoBlocks() running"<<endl;
 
 	// open the video file for reading
 	VideoCapture cap("out.mp4");
@@ -278,7 +233,7 @@ void runKaleidoBlocks(){
 		//if not success or end of frames, break loop
 		if (!bSuccess )
 		{
-			createVideo(0);
+			createVideo();
 			break;
 		}
 
@@ -417,10 +372,10 @@ void runKaleidoBlocks(){
 		bilateralFilter ( block_fusion_pair_2, pair_2, 15, 80, 80 );
 
 		//Write images to file to be converted to video
-		cv::imwrite(getNextName(0),pair_2);
-		cv::imwrite(getNextName(0),pair_1);
-		cv::imwrite(getNextName(0),pair_2);
-		cv::imwrite(getNextName(0),pair_1);
+		cv::imwrite(getNextName(),pair_2);
+		cv::imwrite(getNextName(),pair_1);
+		cv::imwrite(getNextName(),pair_2);
+		cv::imwrite(getNextName(),pair_1);
 
 
 
@@ -429,7 +384,7 @@ void runKaleidoBlocks(){
 
 void runKaleidoRandom(){
 
-	cout<<"RUNNING KALEIDO Random"<<endl;
+		cout<<"runKaleidoRandom() running"<<endl;
 
 		// open the video file for reading
 		VideoCapture cap("out.mp4");
@@ -463,7 +418,7 @@ void runKaleidoRandom(){
 			//if not success or end of frames, break loop
 			if (!bSuccess )
 			{
-				createVideo(1);
+				createVideo();
 				break;
 			}
 
@@ -567,10 +522,10 @@ void runKaleidoRandom(){
 
 			//Write images to file to be converted to video
 
-			cv::imwrite(getNextName(1),color_fusion_pair_2);
-			cv::imwrite(getNextName(1),color_fusion_pair_1);
-			cv::imwrite(getNextName(1),color_fusion_pair_2);
-			cv::imwrite(getNextName(1),color_fusion_pair_1);
+			cv::imwrite(getNextName(),color_fusion_pair_2);
+			cv::imwrite(getNextName(),color_fusion_pair_1);
+			cv::imwrite(getNextName(),color_fusion_pair_2);
+			cv::imwrite(getNextName(),color_fusion_pair_1);
 
 	}
 }
