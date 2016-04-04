@@ -233,7 +233,7 @@ void createVideo(int method){
 	str = ss.str();
 
 	cout<< "video written @"<<frame_rate<<" frames/sec"<<endl;
-	VideoWriter out_capture("video/video.avi", CV_FOURCC('M','J','P','G'), frame_rate, Size(512,512));
+	VideoWriter out_capture(str, CV_FOURCC('M','J','P','G'), frame_rate, Size(512,512));
 
 	while (true){
 
