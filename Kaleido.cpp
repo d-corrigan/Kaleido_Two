@@ -61,8 +61,8 @@ bool isEvenBlock(int y, bool isEven);
 int main(){
 
 	//runKaleidoBlocks();
-	runKaleidoRandom();
-	//runKaleidoMixedAndSmoothed();
+	//runKaleidoRandom();
+	runKaleidoMixedAndSmoothed();
 
 	return (0);
 }
@@ -531,6 +531,154 @@ void runKaleidoRandom(){
 }
 
 void runKaleidoMixedAndSmoothed(){
+
+	cout<<"runKaleidoMixedAndSmoothed() running"<<endl;
+
+			// open the video file for reading
+			VideoCapture cap("out.mp4");
+			//VideoCapture cap("slides.mov");
+
+			if ( !cap.isOpened() )  // if not success, exit program
+			{
+				 cout << "Cannot open the video file" << endl;
+
+			}else{
+				cout<<"Video File Opened."<<endl;
+			}
+
+			//used to keep track of the number of frames
+			int frame_number = 0;
+
+			while(1)
+			{
+
+				/*
+				 *  BGR is the original frame which will converted to Lab and split into 4 sub-frames
+				 *  (two fusion pairs)
+				 */
+				Mat BGR;
+
+				// read the next frame from video
+				bool bSuccess = cap.read(BGR);
+
+
+
+				//if not success or end of frames, break loop
+				if (!bSuccess )
+				{
+					createVideo();
+					break;
+				}
+
+				resize(BGR, BGR, Size(512, 512), 0, 0, INTER_CUBIC);
+
+				//increase the number of frames to show how many original frames that have been processed
+				frame_number++;
+
+				/*
+				 * CIE XYZ is a matrix with format (x,z) Y Luminance
+				 */
+				Mat XYZ;
+
+				//convert BGR to XYZ
+				cvtColor(BGR,XYZ, COLOR_BGR2XYZ);
+
+				//create fusion pair for random color pollution
+				Mat color_fusion_pair_1 = Mat::zeros( XYZ.size(), XYZ.type() );
+				Mat color_fusion_pair_2 = Mat::zeros( XYZ.size(), XYZ.type() );
+
+
+				for(int i = 0; i < XYZ.cols; i++)
+				{
+					for(int j = 0; j < XYZ.rows; j++)
+					{
+
+						bool in_RGB_range = false;
+
+						Vec3b pixel = XYZ.at<Vec3b>(i,j);
+						Vec3b pixels = BGR.at<Vec3b>(i,j);
+						delta = .10;
+
+						//store color in a struct
+						XYZ_color.X = (float)pixel[0];
+						XYZ_color.Y = (float)pixel[1];
+						XYZ_color.Z = (float)pixel[2];
+
+						// convert XYZ values to the Yxy values needed.
+						YXYColors Yxy = convertToYxy(XYZ_color);
+
+
+
+						//Problem with Black and RGB
+						if (isnan(Yxy.x)==true || Yxy.y ==1 ||Yxy.y == 0 ){
+							//cout<< "Yxy: "<<Yxy.Y<< " "<<Yxy.x<<" "<<Yxy.y<<endl;
+							//break;
+							//store color in a struct
+							XYZ_color.X = 139.0;
+							XYZ_color.Y = 137.0;
+							XYZ_color.Z = 137.0;
+
+							// convert XYZ values to the Yxy values needed.
+							Yxy = convertToYxy(XYZ_color);
+
+						}
+
+						while(in_RGB_range == false ){
+
+							//random number between 1 and 0 for random color
+							float random_pointX = getRandomNumberInRange();
+							float random_pointY = getRandomNumberInRange();
+
+							// find out if random color is within the RGB range
+							if (isInRGBRange(random_pointX, random_pointY)){in_RGB_range = true;}
+
+							//get the distance between points
+							float distance = getDistanceBetweenPoints(random_pointX, random_pointY, Yxy.x, Yxy.y);
+
+							//get the angle between points
+							float radians = getAngleInRadians(random_pointX, random_pointY,  Yxy.x, Yxy.y);
+
+							//calculate new point based on distance and angle
+							float newX = calculateNewXPoint(distance, radians, Yxy.x);
+							float newY = calculateNewYPoint(distance, radians, Yxy.y);
+
+							if (isInRGBRange(newX, newY) == true){
+
+								// return two new coordinates to xyz format and add to Mat
+								color_fusion_pair_1.at<Vec3b>(i,j)[0] = convertBackX(Yxy.Y, random_pointX, random_pointY );
+								color_fusion_pair_1.at<Vec3b>(i,j)[1] = convertBackY(Yxy.Y );
+								color_fusion_pair_1.at<Vec3b>(i,j)[2] =  convertBackZ(Yxy.Y, random_pointX, random_pointY );
+
+								color_fusion_pair_2.at<Vec3b>(i,j)[0] = convertBackX(Yxy.Y, newX, newY );
+								color_fusion_pair_2.at<Vec3b>(i,j)[1] = convertBackY(Yxy.Y );
+								color_fusion_pair_2.at<Vec3b>(i,j)[2] = convertBackZ(Yxy.Y, newX, newY );
+
+								in_RGB_range = true;
+
+							}else {
+								in_RGB_range = false;
+
+							}
+						}
+					}
+				}
+
+				//conversion color pollution pair to BGR
+				cvtColor(color_fusion_pair_1,color_fusion_pair_1,COLOR_XYZ2BGR);
+				cvtColor(color_fusion_pair_2,color_fusion_pair_2,COLOR_XYZ2BGR);
+
+				medianBlur(color_fusion_pair_1, color_fusion_pair_1, 5);
+				medianBlur(color_fusion_pair_2, color_fusion_pair_2, 5);
+
+
+				//Write images to file to be converted to video
+
+				cv::imwrite(getNextName(),color_fusion_pair_2);
+				cv::imwrite(getNextName(),color_fusion_pair_1);
+				cv::imwrite(getNextName(),color_fusion_pair_2);
+				cv::imwrite(getNextName(),color_fusion_pair_1);
+
+		}
 
 
 
