@@ -60,9 +60,9 @@ bool isEvenBlock(int y, bool isEven);
 
 int main(){
 
-	//runKaleidoBlocks();
+	runKaleidoBlocks();
 	//runKaleidoRandom();
-	runKaleidoMixedAndSmoothed();
+	//runKaleidoMixedAndSmoothed();
 
 	return (0);
 }
@@ -367,9 +367,9 @@ void runKaleidoBlocks(){
 		cvtColor(block_fusion_pair_2,block_fusion_pair_2,COLOR_XYZ2BGR);
 
 
-		//BILATERAL FILTER	used to smooth blocks
-		bilateralFilter ( block_fusion_pair_1, pair_1, 15, 80, 80 );
-		bilateralFilter ( block_fusion_pair_2, pair_2, 15, 80, 80 );
+		//FILTER	used to smooth blocks
+		medianBlur(block_fusion_pair_1, pair_1, 7);
+		medianBlur(block_fusion_pair_2, pair_2, 7);
 
 		//Write images to file to be converted to video
 		cv::imwrite(getNextName(),pair_2);
@@ -667,8 +667,8 @@ void runKaleidoMixedAndSmoothed(){
 				cvtColor(color_fusion_pair_1,color_fusion_pair_1,COLOR_XYZ2BGR);
 				cvtColor(color_fusion_pair_2,color_fusion_pair_2,COLOR_XYZ2BGR);
 
-				medianBlur(color_fusion_pair_1, color_fusion_pair_1, 5);
-				medianBlur(color_fusion_pair_2, color_fusion_pair_2, 5);
+				medianBlur(color_fusion_pair_1, color_fusion_pair_1, 25);
+				medianBlur(color_fusion_pair_2, color_fusion_pair_2, 25);
 
 
 				//Write images to file to be converted to video
