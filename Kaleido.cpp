@@ -159,9 +159,9 @@ YXYColors convertToYxy(XYZColors c){
 
 	YXYColors newColor;
 
-	newColor.Y = c.X /255;
+	newColor.Y = c.Y /255;
 	newColor.x = c.X / ( c.X + c.Y + c.Z );
-	newColor.y = c.Y / ( c.X + c.Y + c.Z );
+	newColor.y = c.Z / ( c.X + c.Y + c.Z );
 
 	return newColor;
 
